@@ -1,0 +1,1172 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Biệt Đội Vân Tay - Giải Cứu Kho Báu Công Nghệ</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-user-select: none;
+      margin: 0;
+      padding: 0;
+    }
+    body, html {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #000;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    #game-viewport {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #061126;
+    }
+
+    /* Video player kép luân phiên chuyển cảnh mượt */
+    .bg-video {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: opacity 0.6s ease-in-out;
+    }
+    #vid-active { z-index: 2; opacity: 1; }
+    #vid-next { z-index: 1; opacity: 0; }
+
+    .tech-vignette {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      box-shadow: inset 0 0 100px rgba(255, 122, 0, 0.25);
+      pointer-events: none;
+      z-index: 5;
+    }
+
+    #hud-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      padding: 3vh 4vw;
+      pointer-events: none;
+    }
+
+    /* NÚT TUA NHANH DÀNH CHO GIÁO VIÊN */
+    #fast-forward-btn {
+      position: absolute;
+      top: 20px;
+      right: 25px;
+      z-index: 30;
+      pointer-events: auto;
+      background: rgba(255, 255, 255, 0.92);
+      border: 3px solid transparent;
+      background-image: linear-gradient(rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.95)),
+                        linear-gradient(135deg, #ff9a00, #ff5100);
+      background-origin: border-box;
+      background-clip: padding-box, border-box;
+      color: #e65100;
+      padding: 10px 22px;
+      border-radius: 30px;
+      font-size: 16px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(255, 106, 0, 0.35);
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    #fast-forward-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 20px rgba(255, 106, 0, 0.55);
+    }
+    #fast-forward-btn:active { transform: scale(0.95); }
+
+    /* HỘP THOẠI ROBOT TIPI */
+    .mission-header {
+      background: rgba(255, 255, 255, 0.94);
+      border: 4px solid transparent;
+      background-image: linear-gradient(rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.95)),
+                        linear-gradient(135deg, #ffb300, #ff5e00, #ff2a00);
+      background-origin: border-box;
+      background-clip: padding-box, border-box;
+      border-radius: 40px;
+      padding: 16px 45px;
+      color: #d84315;
+      font-size: clamp(20px, 3vw, 30px);
+      font-weight: 900;
+      box-shadow: 0 12px 35px rgba(255, 87, 34, 0.3), inset 0 2px 4px rgba(255, 255, 255, 0.8);
+      transform: translateY(-130px);
+      transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      pointer-events: auto;
+      text-align: center;
+      max-width: 90%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+    .mission-header.visible { transform: translateY(0); }
+
+    /* KHUNG MẪU ĐỐI CHIẾU */
+    .sample-reference-box {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      background: linear-gradient(135deg, #fff3e0, #ffe0b2);
+      border: 2px dashed #ff6f00;
+      border-radius: 24px;
+      padding: 6px 22px;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.08);
+    }
+    .sample-reference-box span {
+      font-size: 16px;
+      color: #e65100;
+      font-weight: 900;
+    }
+
+    #action-zone {
+      display: flex;
+      gap: 30px;
+      align-items: center;
+      justify-content: center;
+      pointer-events: auto;
+      margin-bottom: 4vh;
+      width: 100%;
+    }
+
+    /* NÚT VÂN TAY CĂN GIỮA */
+    .scanner-center-anchor {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 25;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      animation: popOutCenter 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.3) forwards;
+    }
+    @keyframes popOutCenter {
+      0% { transform: translate(-50%, -50%) scale(0.1); opacity: 0; }
+      100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    }
+
+    .scanner-container {
+      position: relative;
+      width: 220px;
+      height: 220px;
+      border-radius: 45px;
+      background: rgba(255, 255, 255, 0.94);
+      border: 5px solid transparent;
+      background-image: linear-gradient(rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.95)),
+                        linear-gradient(135deg, #ffc107, #ff6f00, #ff3d00);
+      background-origin: border-box;
+      background-clip: padding-box, border-box;
+      box-shadow: 0 10px 40px rgba(255, 111, 0, 0.4);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      overflow: hidden;
+      transition: all 0.25s ease;
+    }
+    .scanner-container:hover { transform: scale(1.05); }
+
+    .scanner-icon-svg {
+      width: 120px;
+      height: 145px;
+      filter: drop-shadow(0 2px 8px rgba(255, 111, 0, 0.4));
+    }
+    .scanner-hint {
+      color: #e65100;
+      font-size: 15px;
+      font-weight: 900;
+      margin-top: 5px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+    .laser-line {
+      display: none;
+      position: absolute;
+      left: 0;
+      width: 100%;
+      height: 8px;
+      background: #00e676;
+      box-shadow: 0 0 25px #00e676;
+    }
+    .scanner-container.scanning .laser-line {
+      display: block;
+      animation: scanSweep 1.2s infinite alternate ease-in-out;
+    }
+    @keyframes scanSweep {
+      0% { top: 5%; }
+      100% { top: 90%; }
+    }
+
+    /* NÚT TƯƠNG TÁC CHÍNH */
+    .btn-ready {
+      padding: 20px 60px;
+      font-size: clamp(22px, 3.2vw, 34px);
+      font-weight: 900;
+      border-radius: 50px;
+      border: 4px solid #fff;
+      background: linear-gradient(135deg, #ff9100, #ff3d00);
+      color: #ffffff;
+      cursor: pointer;
+      box-shadow: 0 10px 40px rgba(255, 61, 0, 0.5);
+      animation: bounce-ready 1.5s infinite ease-in-out;
+      transition: transform 0.15s;
+    }
+    .btn-ready:active { transform: scale(0.92); }
+    @keyframes bounce-ready {
+      0%, 100% { transform: scale(1); box-shadow: 0 10px 30px rgba(255, 61, 0, 0.4); }
+      50% { transform: scale(1.08); box-shadow: 0 15px 50px rgba(255, 61, 0, 0.7); }
+    }
+
+    /* THẺ LỰA CHỌN A - B - C */
+    .choice-item {
+      width: clamp(160px, 22vw, 240px);
+      height: clamp(210px, 30vw, 290px);
+      background: rgba(255, 255, 255, 0.94);
+      border: 5px solid transparent;
+      background-image: linear-gradient(rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.95)),
+                        linear-gradient(135deg, #ffb300, #ff6d00, #ff3d00);
+      background-origin: border-box;
+      background-clip: padding-box, border-box;
+      border-radius: 35px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+      cursor: pointer;
+      box-shadow: 0 12px 30px rgba(255, 109, 0, 0.25);
+      transition: transform 0.25s ease, opacity 0.4s ease;
+    }
+    .choice-item:hover {
+      transform: translateY(-8px) scale(1.05);
+      box-shadow: 0 18px 45px rgba(255, 109, 0, 0.5);
+    }
+    .choice-graphic-wrapper {
+      width: 105px;
+      height: 130px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 80px;
+    }
+    .choice-item .label {
+      font-size: clamp(18px, 2.4vw, 24px);
+      font-weight: 900;
+      color: #d84315;
+    }
+
+    .choice-item.wrong-shake {
+      background-image: linear-gradient(rgba(255, 235, 238, 0.95), rgba(255, 235, 238, 0.95)),
+                        linear-gradient(135deg, #ff1744, #d50000) !important;
+      animation: shakeWrong 0.45s ease-in-out forwards;
+    }
+    @keyframes shakeWrong {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-12px); }
+      40%, 80% { transform: translateX(12px); }
+    }
+    .choice-item.fade-disappear {
+      opacity: 0 !important;
+      transform: scale(0.4) !important;
+      pointer-events: none;
+    }
+    .choice-item.correct-glow {
+      background-image: linear-gradient(rgba(232, 245, 233, 0.95), rgba(232, 245, 233, 0.95)),
+                        linear-gradient(135deg, #00e676, #00b0ff) !important;
+      box-shadow: 0 0 60px rgba(0, 230, 118, 0.9) !important;
+      transform: scale(1.1) !important;
+    }
+
+    /* POPUP HUY HIỆU CHIẾN THẮNG CUỐI CÙNG */
+    #badge-modal {
+      display: none;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(255, 255, 255, 0.96);
+      border: 6px solid #ff9100;
+      border-radius: 40px;
+      padding: 40px 50px;
+      text-align: center;
+      z-index: 100;
+      box-shadow: 0 0 100px rgba(255, 145, 0, 0.8), 0 20px 40px rgba(0,0,0,0.5);
+      max-width: 85%;
+      animation: popBadge 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+    @keyframes popBadge {
+      0% { transform: translate(-50%, -50%) scale(0.3); opacity: 0; }
+      100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    }
+    .badge-icon {
+      font-size: 110px;
+      animation: spinBadge 8s infinite linear;
+      margin-bottom: 15px;
+    }
+    @keyframes spinBadge {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* MÀN HÌNH CHỜ THẢ NỔI TRỰC TIẾP */
+    #start-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6vh 4vw 8vh 4vw;
+      background: transparent;
+      overflow: hidden;
+      transition: opacity 0.5s ease-out;
+    }
+
+    #title-bg-video {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 1;
+      opacity: 1;
+    }
+
+    .title-gradient-vignette {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at center, rgba(6, 17, 38, 0.1) 0%, rgba(6, 17, 38, 0.6) 100%);
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    .title-header-zone {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .title-badge-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .title-pill {
+      background: rgba(255, 255, 255, 0.9);
+      border: 2px solid #ff9100;
+      color: #e65100;
+      padding: 6px 18px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    .title-main-text {
+      font-size: clamp(34px, 5.5vw, 60px);
+      font-weight: 1000;
+      letter-spacing: 2px;
+      line-height: 1.15;
+      color: #ffffff;
+      text-shadow: 0 4px 20px rgba(255, 109, 0, 0.9), 0 2px 4px #000;
+    }
+
+    .title-sub-text {
+      font-size: clamp(18px, 2.8vw, 30px);
+      font-weight: 900;
+      color: #00f2fe;
+      letter-spacing: 1.5px;
+      text-shadow: 0 2px 15px rgba(0, 242, 254, 0.8), 0 2px 4px #000;
+      margin-top: 6px;
+    }
+
+    .title-action-zone {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .pro-start-btn {
+      position: relative;
+      padding: clamp(18px, 2.6vh, 25px) clamp(55px, 6vw, 80px);
+      font-size: clamp(24px, 3.2vw, 36px);
+      font-weight: 1000;
+      letter-spacing: 1.5px;
+      border-radius: 60px;
+      border: 4px solid #ffffff;
+      background: linear-gradient(135deg, #ff9100 0%, #ff5722 50%, #e65100 100%);
+      color: #ffffff;
+      cursor: pointer;
+      box-shadow: 
+        0 14px 40px rgba(255, 87, 34, 0.7),
+        0 0 35px rgba(255, 145, 0, 0.8),
+        inset 0 3px 6px rgba(255, 255, 255, 0.7);
+      transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .pro-start-btn::before {
+      content: "";
+      position: absolute;
+      top: -50%;
+      left: -60%;
+      width: 40%;
+      height: 200%;
+      background: linear-gradient(
+        to right,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0.6) 50%,
+        rgba(255, 255, 255, 0) 100%
+      );
+      transform: rotate(25deg);
+      animation: btnShimmerSweep 3s infinite ease-in-out;
+    }
+    @keyframes btnShimmerSweep {
+      0% { left: -60%; }
+      30%, 100% { left: 130%; }
+    }
+
+    .pro-start-btn:hover {
+      transform: scale(1.07) translateY(-3px);
+      box-shadow: 
+        0 18px 50px rgba(255, 87, 34, 0.85),
+        0 0 45px rgba(255, 145, 0, 1);
+    }
+    .pro-start-btn:active {
+      transform: scale(0.96) translateY(2px);
+    }
+
+    .rocket-icon {
+      font-size: 1.25em;
+      display: inline-block;
+      animation: rocketHover 1.5s ease-in-out infinite alternate;
+    }
+    @keyframes rocketHover {
+      0% { transform: translateY(0) rotate(0deg); }
+      100% { transform: translateY(-5px) rotate(10deg); }
+    }
+
+    .title-footer-tip {
+      font-size: 15px;
+      color: rgba(255, 255, 255, 0.85);
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      text-shadow: 0 2px 6px rgba(0, 0, 0, 0.9);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- MÀN HÌNH CHỜ THẢ NỔI TRỰC TIẾP -->
+  <div id="start-overlay">
+    <video id="title-bg-video" autoplay loop muted playsinline>
+      <source src="videos/title_screen_loop.mp4" type="video/mp4">
+    </video>
+    <div class="title-gradient-vignette"></div>
+
+    <div class="title-header-zone">
+      <div class="title-badge-row">
+        <span class="title-pill">🎮 TRÒ CHƠI TƯƠNG TÁC THỰC</span>
+        <span class="title-pill">👶 5–6 TUỔI</span>
+      </div>
+      <div class="title-main-text">BIỆT ĐỘI VÂN TAY</div>
+      <div class="title-sub-text">GIẢI CỨU KHO BÁU CÔNG NGHỆ</div>
+    </div>
+
+    <div class="title-action-zone">
+      <button id="start-btn" class="pro-start-btn" onclick="startGame()">
+        <span>KHỞI ĐẦU CHUYẾN ĐI</span>
+        <span class="rocket-icon">🚀</span>
+      </button>
+      <div class="title-footer-tip">💡 Chạm nút để bật toàn màn hình và bắt đầu trò chơi</div>
+    </div>
+  </div>
+
+  <!-- VIEWPORT CHÍNH -->
+  <div id="game-viewport">
+    <div class="tech-vignette"></div>
+
+    <button id="fast-forward-btn" onclick="handleFastForward()">
+      <span>Tua nhanh</span> ⏩
+    </button>
+
+    <video id="vid-active" class="bg-video" playsinline></video>
+    <video id="vid-next" class="bg-video" playsinline></video>
+
+    <div id="hud-overlay">
+      <div id="mission-text" class="mission-header">Đang tải...</div>
+      <div id="action-zone"></div>
+    </div>
+
+    <div id="badge-modal">
+      <div class="badge-icon">🎖️</div>
+      <h1 style="color: #d84315; font-size: 36px; margin-bottom: 15px; font-weight: 900;">
+        HUY HIỆU BIỆT ĐỘI VÂN TAY THÔNG MINH!
+      </h1>
+      <p style="font-size: 22px; line-height: 1.6; color: #37474f; font-weight: 700; margin-bottom: 25px;">
+        Chúc mừng các bạn nhỏ đã hoàn thành xuất sắc tất cả nhiệm vụ bảo mật!<br>
+        <strong style="color: #ff6d00;">Ghi nhớ bài học:</strong> Dấu vân tay là thông tin riêng tư, chúng ta không tự ý lấy dấu vân tay của người khác nhé!
+      </p>
+      <button onclick="location.reload()" style="padding: 16px 45px; font-size: 22px; font-weight: 900; border-radius: 35px; background: linear-gradient(135deg, #ff9100, #ff3d00); color: #fff; border: none; cursor: pointer; box-shadow: 0 8px 25px rgba(255, 61, 0, 0.5);">
+        CHƠI LẠI TỪ ĐẦU 🔄
+      </button>
+    </div>
+  </div>
+
+  <script>
+    const REAL_FINGERPRINT_SVG = `
+      <svg viewBox="0 0 200 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="tipiOrange" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#ff9100" />
+            <stop offset="50%" stop-color="#ff5722" />
+            <stop offset="100%" stop-color="#e65100" />
+          </linearGradient>
+        </defs>
+        <g stroke="url(#tipiOrange)" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M 52,185 C 44,162 42,128 54,92 C 68,50 114,35 146,55 C 165,68 174,92 170,122 C 166,152 158,188 148,205" />
+          <path d="M 64,196 C 56,170 54,138 65,102 C 76,68 116,52 140,68 C 156,80 162,106 158,135 C 154,162 144,196 138,208" />
+          <path d="M 76,198 C 70,172 68,136 78,110 C 86,85 116,74 134,88 C 146,98 150,118 146,145 C 142,170 130,202 124,212" />
+          <path d="M 88,198 C 82,175 80,146 88,122 C 95,100 118,92 130,105 C 138,115 138,132 134,155 C 130,176 118,202 112,210" />
+          <path d="M 98,192 C 94,175 92,154 98,134 C 103,118 118,112 125,122 C 128,128 128,142 124,160 C 120,178 112,198 106,204" />
+          <path d="M 106,180 C 104,166 104,150 108,140 C 112,130 120,132 122,142 C 122,154 116,170 110,185" />
+          <path d="M 112,168 C 111,158 112,150 115,146 C 117,144 120,146 119,152 C 118,158 115,166 113,172" />
+          <path d="M 46,140 C 44,152 45,170 48,180" /><path d="M 166,135 C 168,146 166,162 162,174" /><path d="M 78,212 C 86,216 98,218 108,218" />
+        </g>
+      </svg>
+    `;
+
+    const STRIPES_HORIZONTAL_SVG = `
+      <svg viewBox="0 0 200 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <g stroke="#ff7043" stroke-width="5" stroke-linecap="round" opacity="0.85">
+          <line x1="30" y1="50" x2="170" y2="50" /><line x1="30" y1="85" x2="170" y2="85" />
+          <line x1="30" y1="120" x2="170" y2="120" /><line x1="30" y1="155" x2="170" y2="155" />
+          <line x1="30" y1="190" x2="170" y2="190" />
+        </g>
+      </svg>
+    `;
+
+    const STRIPES_VERTICAL_SVG = `
+      <svg viewBox="0 0 200 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <g stroke="#ff7043" stroke-width="5" stroke-linecap="round" opacity="0.85">
+          <line x1="50" y1="40" x2="50" y2="205" /><line x1="85" y1="40" x2="85" y2="205" />
+          <line x1="120" y1="40" x2="120" y2="205" /><line x1="155" y1="40" x2="155" y2="205" />
+        </g>
+      </svg>
+    `;
+
+    const SCENARIOS = [
+      // ================= CHẶNG 1 =================
+      {
+        id: "intro",
+        videoSrc: "videos/intro.mp4",
+        text: "🤖 Robot Tipi: 'Chào Biệt đội! Các bạn đã sẵn sàng giải cứu kho báu chưa?'",
+        loop: false,
+        autoNext: true
+      },
+      {
+        id: "intro_listen",
+        videoSrc: "videos/intro_listen_loop.mp4",
+        text: "👂 Robot Tipi đang lắng nghe: Cả lớp hãy hô thật to 'SẴN SÀNG' nào!",
+        loop: true,
+        type: "ready_btn",
+        label: "✨ ĐÃ SẴN SÀNG! 🚀"
+      },
+      {
+        id: "scene1_zoom",
+        videoSrc: "videos/scene1_door_zoom.mp4",
+        text: "🤖 'Hãy đặt tay của bạn vào ô giữa màn hình để quét nhé!'",
+        loop: false,
+        type: "zoom_scan_center",
+        autoNext: false
+      },
+      {
+        id: "scene1_zoomout",
+        videoSrc: "videos/scene1_door_zoomout.mp4",
+        text: "Đâu là dấu vân tay xoắn ốc giống chìa khóa mẫu?",
+        loop: false,
+        autoNext: true
+      },
+      {
+        id: "scene1_question",
+        videoSrc: "videos/scene1_waiting_loop.mp4",
+        text: "Hãy quan sát mẫu và chọn hình dấu vân tay chính xác nhé!",
+        loop: true,
+        type: "choice_with_sample",
+        options: [
+          { graphic: REAL_FINGERPRINT_SVG, label: "Hình A", correct: true, isSvg: true },
+          { graphic: STRIPES_HORIZONTAL_SVG, label: "Hình B (Sọc Ngang)", correct: false, isSvg: true },
+          { graphic: STRIPES_VERTICAL_SVG, label: "Hình C (Sọc Dọc)", correct: false, isSvg: true }
+        ]
+      },
+      {
+        id: "scene1_congrats",
+        videoSrc: "videos/scene1_success.mp4",
+        text: "🎉 Robot Tipi: 'Bạn đã chọn chính xác rồi!'",
+        loop: false,
+        autoNext: true
+      },
+
+      // ================= CHẶNG 2: NHẬN DIỆN GƯƠNG MẶT =================
+      {
+        id: "scene2_enter",
+        videoSrc: "videos/scene2_enter_room.mp4",
+        text: "🤖 'Cửa đã mở rộng rồi! Đi theo tớ qua cánh cửa để vào Trạm Nhận Diện Gương Mặt nào!'",
+        loop: false,
+        autoNext: true
+      },
+      {
+        id: "scene2_mirror_loop",
+        videoSrc: "videos/scene2_mirror_waiting_loop.mp4",
+        text: "🪞 Cả lớp hãy đứng dậy, nhìn vào màn hình và cười thật tươi trước gương nhé!",
+        loop: true,
+        type: "ready_btn",
+        label: "📸 BẮT ĐẦU QUÉT GƯƠNG MẶT"
+      },
+      {
+        id: "scene2_scanned",
+        videoSrc: "videos/scene2_face_scanned.mp4",
+        text: "🤖 Robot Tipi: 'Nhận diện thành công! Bây giờ hãy tìm khuôn mặt cười tươi giống mẫu!'",
+        loop: false,
+        autoNext: true
+      },
+      {
+        id: "scene2_question",
+        videoSrc: "videos/scene2_waiting_loop.mp4",
+        text: "Khuôn mặt hoạt hình nào đang cười tươi giống hình mẫu trên gương?",
+        loop: true,
+        type: "choice_face",
+        options: [
+          { graphic: "😄", label: "Mặt A (Cười Tươi)", correct: true, isSvg: false },
+          { graphic: "😴", label: "Mặt B (Buồn Ngủ)", correct: false, isSvg: false },
+          { graphic: "😮", label: "Mặt C (Ngạc Nhiên)", correct: false, isSvg: false }
+        ]
+      },
+      {
+        id: "scene2_congrats",
+        videoSrc: "videos/scene2_success.mp4",
+        text: "🎉 'Chính xác rồi! Nụ cười tỏa sáng tuyệt vời! Nhận được mảnh ghép kho báu!'",
+        loop: false,
+        autoNext: true
+      },
+
+      // ================= CHẶNG 3: NHẬN DIỆN GIỌNG NÓI =================
+      {
+        id: "scene3_enter",
+        videoSrc: "videos/scene3_enter_room.mp4",
+        text: "🤖 Robot Tipi: 'Đi theo tớ nào! Chúng ta cùng đến Trạm Nhận Diện Giọng Nói!'",
+        loop: false,
+        autoNext: true
+      },
+      {
+        id: "scene3_intro",
+        videoSrc: "videos/scene3_voice_intro.mp4",
+        text: "🎤 'Chào mừng đến với Trạm Nhận Diện Giọng Nói! Cùng hô to: BIỆT ĐỘI SẴN SÀNG nào!'",
+        loop: false,
+        autoNext: true
+      },
+      {
+        id: "scene3_listen_loop",
+        videoSrc: "videos/scene3_listen_loop.mp4",
+        text: "👂 Cả lớp hãy đồng thanh hô thật to: 'BIỆT ĐỘI SẴN SÀNG!'",
+        loop: true,
+        type: "ready_btn",
+        label: "🎙️ CẢ LỚP ĐÃ HÔ XONG! 🚀"
+      },
+      {
+        id: "scene3_motion_command",
+        videoSrc: "videos/scene3_sound_success.mp4",
+        text: "👏 Giỏi lắm! Cả lớp hãy vỗ tay 2 cái thật đều nào! 1... 2!",
+        loop: false,
+        type: "ready_btn",
+        label: "👏 XÁC NHẬN ĐÃ VỖ TAY XONG!"
+      },
+      {
+        id: "scene3_congrats_stage",
+        videoSrc: "videos/scene3_congrats.mp4",
+        text: "🎉 Hoan hô! Chúc mừng các bạn! Chúng ta cùng tiến đến chặng cuối cùng nào!",
+        loop: false,
+        autoNext: true
+      },
+
+      // ================= CHẶNG 5: CỔNG RA & TRẠM KIỂM SOÁT VÂN TAY =================
+      {
+        id: "scene5_enter",
+        videoSrc: "videos/scene5_enter_gate.mp4",
+        text: "🤖 'Chúng ta đã đến Trạm Kiểm Soát Cổng Ra! Hãy chọn đúng dấu vân tay đã đăng ký ở đầu trò chơi!'",
+        loop: false,
+        autoNext: true
+      },
+      {
+        id: "scene5_question",
+        videoSrc: "videos/scene5_waiting_loop.mp4",
+        text: "Trạm Kiểm Soát: Đâu là dấu vân tay bạn đã đăng ký ở đầu trò chơi?",
+        loop: true,
+        type: "choice_final_checkpoint",
+        options: [
+          { graphic: STRIPES_HORIZONTAL_SVG, label: "Thẻ A (Sọc Ngang)", correct: false, isSvg: true },
+          { graphic: REAL_FINGERPRINT_SVG, label: "Thẻ B (Vân Tay Đăng Ký)", correct: true, isSvg: true },
+          { graphic: STRIPES_VERTICAL_SVG, label: "Thẻ C (Sọc Dọc)", correct: false, isSvg: true }
+        ]
+      },
+      {
+        id: "scene5_open",
+        videoSrc: "videos/scene5_treasure_open.mp4",
+        text: "🏆 XÁC THỰC THÀNH CÔNG! KHO BÁU CÔNG NGHỆ ĐÃ MỞ!",
+        loop: false,
+        autoNext: true
+      },
+      {
+        id: "scene5_badge_end",
+        videoSrc: "videos/scene5_ending_badge.mp4",
+        text: "🎖️ Chúc mừng Biệt Đội Vân Tay Thông Minh! Hãy nhớ giữ bí mật thông tin riêng tư nhé!",
+        loop: false,
+        type: "show_badge_screen"
+      }
+    ];
+
+    let currentStep = 0;
+    let activePlayer = document.getElementById("vid-active");
+    let nextPlayer = document.getElementById("vid-next");
+    const missionText = document.getElementById("mission-text");
+    const actionZone = document.getElementById("action-zone");
+
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    function playBeep(freq = 600, duration = 0.15) {
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.frequency.value = freq;
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+      osc.stop(audioCtx.currentTime + duration);
+    }
+
+    function playDoubleBeep() {
+      playBeep(880, 0.1);
+      setTimeout(() => playBeep(1200, 0.18), 120);
+    }
+
+    function playLaserSound() {
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = "sawtooth";
+      osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(200, audioCtx.currentTime + 0.4);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.4);
+      osc.stop(audioCtx.currentTime + 0.4);
+    }
+
+    function playGentleFailSound() {
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(320, audioCtx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(140, audioCtx.currentTime + 0.35);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.35);
+      osc.stop(audioCtx.currentTime + 0.35);
+    }
+
+    function playSuccessSound() {
+      playBeep(523, 0.1);
+      setTimeout(() => playBeep(659, 0.1), 100);
+      setTimeout(() => playBeep(783, 0.25), 200);
+    }
+
+    function playVictoryFanfare() {
+      playBeep(523, 0.15);
+      setTimeout(() => playBeep(659, 0.15), 150);
+      setTimeout(() => playBeep(783, 0.15), 300);
+      setTimeout(() => playBeep(1046, 0.5), 450);
+    }
+
+    function handleFastForward() {
+      const scene = SCENARIOS[currentStep];
+      if (!scene) return;
+      playBeep(900, 0.08);
+
+      if (scene.loop) {
+        proceedNext();
+        return;
+      }
+
+      if (activePlayer.duration && !isNaN(activePlayer.duration)) {
+        activePlayer.currentTime = Math.max(0, activePlayer.duration - 0.15);
+      } else {
+        if (scene.autoNext) {
+          proceedNext();
+        } else {
+          showInteraction(scene);
+        }
+      }
+    }
+
+    function startGame() {
+      playSuccessSound();
+      const overlay = document.getElementById("start-overlay");
+      overlay.style.opacity = "0";
+      
+      const titleVid = document.getElementById("title-bg-video");
+      if (titleVid) titleVid.pause();
+
+      setTimeout(() => {
+        overlay.style.display = "none";
+      }, 500);
+
+      if (document.documentElement.requestFullscreen) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      }
+      playScene(currentStep);
+    }
+
+    function playScene(index) {
+      const scene = SCENARIOS[index];
+      
+      missionText.classList.remove("visible");
+      actionZone.innerHTML = "";
+
+      activePlayer.onended = null;
+      nextPlayer.onended = null;
+      activePlayer.oncanplay = null;
+      nextPlayer.oncanplay = null;
+      activePlayer.onerror = null;
+      nextPlayer.onerror = null;
+
+      if (scene.loop) {
+        nextPlayer.loop = true;
+        nextPlayer.setAttribute("loop", "true");
+      } else {
+        nextPlayer.loop = false;
+        nextPlayer.removeAttribute("loop");
+      }
+
+      let isSwapped = false;
+      const completeSwap = () => {
+        if (isSwapped) return;
+        isSwapped = true;
+
+        activePlayer.pause();
+        let temp = activePlayer;
+        activePlayer = nextPlayer;
+        nextPlayer = temp;
+
+        if (scene.loop) {
+          activePlayer.onended = () => {
+            if (SCENARIOS[currentStep] && SCENARIOS[currentStep].loop) {
+              activePlayer.currentTime = 0;
+              activePlayer.play().catch(() => {});
+            }
+          };
+          showInteraction(scene);
+        } else {
+          // Chỉ nút ready_btn mới hiển thị ngay khi video nạp xong
+          if (scene.type === "ready_btn") {
+            showInteraction(scene);
+          }
+
+          // FIX BUG: scene1_door_zoom.mp4 phải CHỜ VIDEO PHÁT XONG (onended) mới hiện khung quét vân tay
+          activePlayer.onended = () => {
+            if (scene.type === "show_badge_screen") {
+              showInteraction(scene);
+            } else if (scene.autoNext) {
+              proceedNext();
+            } else if (scene.type && scene.type !== "ready_btn") {
+              showInteraction(scene);
+            }
+          };
+        }
+      };
+
+      nextPlayer.src = scene.videoSrc;
+      nextPlayer.load();
+
+      nextPlayer.oncanplay = () => {
+        nextPlayer.oncanplay = null;
+        nextPlayer.play().catch(err => console.log("Autoplay:", err));
+        
+        nextPlayer.style.opacity = "1";
+        activePlayer.style.opacity = "0";
+
+        setTimeout(completeSwap, 500);
+      };
+
+      nextPlayer.onerror = () => {
+        console.warn("Chế độ mô phỏng khi chưa có video:", scene.videoSrc);
+        nextPlayer.style.opacity = "1";
+        activePlayer.style.opacity = "0";
+        setTimeout(() => {
+          let temp = activePlayer;
+          activePlayer = nextPlayer;
+          nextPlayer = temp;
+
+          if (scene.type === "show_badge_screen") {
+            showInteraction(scene);
+          } else if (scene.autoNext) {
+            setTimeout(proceedNext, 1500);
+          } else {
+            showInteraction(scene);
+          }
+        }, 300);
+      };
+    }
+
+    function showInteraction(scene) {
+      actionZone.innerHTML = "";
+
+      // 1. QUÉT VÂN TAY
+      if (scene.type === "zoom_scan_center") {
+        missionText.innerHTML = scene.text;
+        missionText.classList.add("visible");
+
+        const anchor = document.createElement("div");
+        anchor.className = "scanner-center-anchor";
+
+        const scannerBox = document.createElement("div");
+        scannerBox.className = "scanner-container";
+        scannerBox.innerHTML = `
+          <div class="laser-line"></div>
+          <div class="scanner-icon-svg">${REAL_FINGERPRINT_SVG}</div>
+          <div class="scanner-hint">CHẠM ĐỂ QUÉT</div>
+        `;
+
+        let isScanning = false;
+        scannerBox.onclick = () => {
+          if (isScanning) return;
+          isScanning = true;
+
+          scannerBox.classList.add("scanning");
+          scannerBox.querySelector(".scanner-hint").innerText = "ĐANG QUÉT...";
+          playLaserSound();
+
+          setTimeout(() => {
+            scannerBox.querySelector(".scanner-hint").innerText = "XÁC NHẬN THÀNH CÔNG";
+            playSuccessSound();
+
+            setTimeout(() => {
+              anchor.remove();
+              proceedNext();
+            }, 800);
+          }, 1500);
+        };
+
+        anchor.appendChild(scannerBox);
+        actionZone.appendChild(anchor);
+
+      // 2. NÚT SẴN SÀNG / QUÉT GƯƠNG MẶT / HÔ KHẨU LỆNH / VỖ TAY
+      } else if (scene.type === "ready_btn") {
+        missionText.innerHTML = scene.text;
+        missionText.classList.add("visible");
+
+        const btn = document.createElement("button");
+        btn.className = "btn-ready";
+        btn.innerText = scene.label;
+        btn.onclick = () => {
+          playDoubleBeep();
+          proceedNext();
+        };
+        actionZone.appendChild(btn);
+
+      // 3. CÂU HỎI CHẶNG 1, CHẶNG 2 HOẶC TRẠM KIỂM SOÁT CHẶNG CUỐI
+      } else if (scene.type === "choice_with_sample" || scene.type === "choice_face" || scene.type === "choice_final_checkpoint") {
+        if (scene.type === "choice_with_sample" || scene.type === "choice_final_checkpoint") {
+          missionText.innerHTML = `
+            <div>${scene.text}</div>
+            <div class="sample-reference-box">
+              <span>VÂN TAY ĐĂNG KÝ BAN ĐẦU:</span>
+              <div style="width: 48px; height: 58px;">${REAL_FINGERPRINT_SVG}</div>
+            </div>
+          `;
+        } else {
+          missionText.innerHTML = `
+            <div>${scene.text}</div>
+            <div class="sample-reference-box">
+              <span>MẪU GƯƠNG MẶT:</span>
+              <span style="font-size: 32px;">😄 (CƯỜI TƯƠI)</span>
+            </div>
+          `;
+        }
+        missionText.classList.add("visible");
+
+        scene.options.forEach(opt => {
+          const item = document.createElement("div");
+          item.className = "choice-item";
+          
+          item.innerHTML = `
+            <div class="choice-graphic-wrapper">${opt.graphic}</div>
+            <div class="label">${opt.label}</div>
+          `;
+          
+          item.onclick = () => {
+            if (opt.correct) {
+              item.classList.add("correct-glow");
+              playSuccessSound();
+              
+              document.querySelectorAll(".choice-item").forEach(c => c.style.pointerEvents = "none");
+              
+              setTimeout(() => {
+                proceedNext();
+              }, 1200);
+
+            } else {
+              playGentleFailSound();
+              item.classList.add("wrong-shake");
+              item.style.pointerEvents = "none";
+
+              setTimeout(() => {
+                item.classList.add("fade-disappear");
+                setTimeout(() => {
+                  item.style.display = "none";
+                }, 400);
+              }, 500);
+
+              let failClip = "videos/scene1_fail.mp4";
+              let loopClip = "videos/scene1_waiting_loop.mp4";
+
+              if (scene.type === "choice_face") {
+                failClip = "videos/scene2_fail.mp4";
+                loopClip = "videos/scene2_waiting_loop.mp4";
+              } else if (scene.type === "choice_final_checkpoint") {
+                failClip = "videos/scene5_fail.mp4";
+                loopClip = "videos/scene5_waiting_loop.mp4";
+              }
+
+              playFailVideoFeedback(failClip, loopClip);
+            }
+          };
+          actionZone.appendChild(item);
+        });
+
+      // 4. MÀN HÌNH HUY HIỆU KẾT THÚC
+      } else if (scene.type === "show_badge_screen") {
+        missionText.innerHTML = scene.text;
+        missionText.classList.add("visible");
+        playVictoryFanfare();
+        document.getElementById("badge-modal").style.display = "block";
+      }
+    }
+
+    function playFailVideoFeedback(failVideo, loopVideo) {
+      nextPlayer.src = failVideo;
+      nextPlayer.loop = false;
+      nextPlayer.removeAttribute("loop");
+      nextPlayer.load();
+
+      nextPlayer.oncanplay = () => {
+        nextPlayer.oncanplay = null;
+        nextPlayer.play().catch(() => {});
+        nextPlayer.style.opacity = "1";
+        activePlayer.style.opacity = "0";
+
+        setTimeout(() => {
+          activePlayer.pause();
+          let temp = activePlayer;
+          activePlayer = nextPlayer;
+          nextPlayer = temp;
+
+          activePlayer.onended = () => {
+            resumeWaitingLoop(loopVideo);
+          };
+        }, 500);
+      };
+
+      nextPlayer.onerror = () => {
+        console.warn("Chưa có clip fail, tự động quay lại loop.");
+        resumeWaitingLoop(loopVideo);
+      };
+    }
+
+    function resumeWaitingLoop(loopVideo) {
+      nextPlayer.src = loopVideo;
+      nextPlayer.loop = true;
+      nextPlayer.setAttribute("loop", "true");
+      nextPlayer.load();
+
+      nextPlayer.oncanplay = () => {
+        nextPlayer.oncanplay = null;
+        nextPlayer.play().catch(() => {});
+        nextPlayer.style.opacity = "1";
+        activePlayer.style.opacity = "0";
+
+        setTimeout(() => {
+          activePlayer.pause();
+          let temp = activePlayer;
+          activePlayer = nextPlayer;
+          nextPlayer = temp;
+        }, 500);
+      };
+
+      nextPlayer.onerror = () => {
+        console.warn("Lỗi tải loop video:", loopVideo);
+      };
+    }
+
+    function proceedNext() {
+      actionZone.innerHTML = "";
+      missionText.classList.remove("visible");
+      
+      currentStep++;
+      if (currentStep < SCENARIOS.length) {
+        setTimeout(() => {
+          playScene(currentStep);
+        }, 300);
+      }
+    }
+  </script>
+</body>
+</html>
