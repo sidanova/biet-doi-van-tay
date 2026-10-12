@@ -20,6 +20,59 @@
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
 
+    /* =====================================================================
+       LỚP PHỦ NHẮC XOAY NGANG MÀN HÌNH (PORTRAIT BLOCKER)
+       ===================================================================== */
+    #rotate-device-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: radial-gradient(circle at center, #0b224d 0%, #030a1c 100%);
+      z-index: 99999;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 30px;
+    }
+
+    @media screen and (orientation: portrait) {
+      #rotate-device-overlay {
+        display: flex;
+      }
+    }
+
+    .rotate-phone-icon {
+      font-size: 80px;
+      animation: rotateGuide 1.8s ease-in-out infinite alternate;
+      margin-bottom: 20px;
+    }
+
+    @keyframes rotateGuide {
+      0% { transform: rotate(0deg); }
+      50% { transform: rotate(-90deg); }
+      100% { transform: rotate(-90deg); }
+    }
+
+    .rotate-text-title {
+      color: #ff9100;
+      font-size: clamp(22px, 5vw, 28px);
+      font-weight: 900;
+      margin-bottom: 10px;
+    }
+
+    .rotate-text-desc {
+      color: #00f2fe;
+      font-size: clamp(16px, 3.5vw, 20px);
+      font-weight: 700;
+    }
+
+    /* =====================================================================
+       VIEWPORT & VIDEO PLAYER KÉP
+       ===================================================================== */
     #game-viewport {
       position: relative;
       width: 100vw;
@@ -30,7 +83,6 @@
       background: #061126;
     }
 
-    /* Video player kép luân phiên chuyển cảnh mượt */
     .bg-video {
       position: absolute;
       top: 0;
@@ -335,7 +387,9 @@
       100% { transform: rotate(360deg); }
     }
 
-    /* MÀN HÌNH CHỜ THẢ NỔI TRỰC TIẾP */
+    /* =====================================================================
+       MÀN HÌNH CHỜ THẢ NỔI TRỰC TIẾP
+       ===================================================================== */
     #start-overlay {
       position: absolute;
       top: 0;
@@ -427,6 +481,8 @@
       flex-direction: column;
       align-items: center;
       gap: 14px;
+      width: 100%;
+      max-width: 500px;
     }
 
     .pro-start-btn {
@@ -492,6 +548,40 @@
       100% { transform: translateY(-5px) rotate(10deg); }
     }
 
+    /* THANH TIẾN TRÌNH PRELOAD VIDEO */
+    #preload-progress-box {
+      width: 100%;
+      max-width: 320px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+    .progress-bar-bg {
+      width: 100%;
+      height: 10px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 145, 0, 0.4);
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);
+    }
+    #preload-fill {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, #ff9100, #00e676);
+      border-radius: 10px;
+      transition: width 0.3s ease;
+      box-shadow: 0 0 10px #00e676;
+    }
+    #preload-status-text {
+      font-size: 13px;
+      color: #00f2fe;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      text-shadow: 0 1px 4px #000;
+    }
+
     .title-footer-tip {
       font-size: 15px;
       color: rgba(255, 255, 255, 0.85);
@@ -503,7 +593,18 @@
 </head>
 <body>
 
-  <!-- MÀN HÌNH CHỜ THẢ NỔI TRỰC TIẾP -->
+  <!-- ==========================================================
+       MÀN HÌNH NHẮC XOAY NGANG THIẾT BỊ (CHO ĐIỆN THOẠI/TABLET)
+       ========================================================== -->
+  <div id="rotate-device-overlay">
+    <div class="rotate-phone-icon">📱</div>
+    <div class="rotate-text-title">HÃY XOAY NGANG THIẾT BỊ NHÉ!</div>
+    <div class="rotate-text-desc">Để có góc nhìn tốt nhất cùng Robot Tipi 🚀</div>
+  </div>
+
+  <!-- ==========================================================
+       MÀN HÌNH CHỜ THẢ NỔI TRỰC TIẾP
+       ========================================================== -->
   <div id="start-overlay">
     <video id="title-bg-video" autoplay loop muted playsinline>
       <source src="videos/title_screen_loop.mp4" type="video/mp4">
@@ -524,11 +625,22 @@
         <span>KHỞI ĐẦU CHUYẾN ĐI</span>
         <span class="rocket-icon">🚀</span>
       </button>
+
+      <!-- THANH TRẠNG THÁI PRELOAD -->
+      <div id="preload-progress-box">
+        <div class="progress-bar-bg">
+          <div id="preload-fill"></div>
+        </div>
+        <div id="preload-status-text">Đang tối ưu dữ liệu video: 0%</div>
+      </div>
+
       <div class="title-footer-tip">💡 Chạm nút để bật toàn màn hình và bắt đầu trò chơi</div>
     </div>
   </div>
 
-  <!-- VIEWPORT CHÍNH -->
+  <!-- ==========================================================
+       VIEWPORT CHÍNH
+       ========================================================== -->
   <div id="game-viewport">
     <div class="tech-vignette"></div>
 
@@ -602,7 +714,7 @@
     `;
 
     const SCENARIOS = [
-      // ================= CHẶNG 1 =================
+      // ================= CHẶNG 1 =================[cite: 2]
       {
         id: "intro",
         videoSrc: "videos/intro.mp4",
@@ -653,7 +765,7 @@
         autoNext: true
       },
 
-      // ================= CHẶNG 2: NHẬN DIỆN GƯƠNG MẶT =================
+      // ================= CHẶNG 2: NHẬN DIỆN GƯƠNG MẶT =================[cite: 2]
       {
         id: "scene2_enter",
         videoSrc: "videos/scene2_enter_room.mp4",
@@ -696,7 +808,7 @@
         autoNext: true
       },
 
-      // ================= CHẶNG 3: NHẬN DIỆN GIỌNG NÓI =================
+      // ================= CHẶNG 3: NHẬN DIỆN GIỌNG NÓI =================[cite: 2]
       {
         id: "scene3_enter",
         videoSrc: "videos/scene3_enter_room.mp4",
@@ -735,7 +847,7 @@
         autoNext: true
       },
 
-      // ================= CHẶNG 5: CỔNG RA & TRẠM KIỂM SOÁT VÂN TAY =================
+      // ================= CHẶNG 5: CỔNG RA & TRẠM KIỂM SOÁT VÂN TAY =================[cite: 2]
       {
         id: "scene5_enter",
         videoSrc: "videos/scene5_enter_gate.mp4",
@@ -777,6 +889,58 @@
     const missionText = document.getElementById("mission-text");
     const actionZone = document.getElementById("action-zone");
 
+    // =========================================================================
+    // HỆ THỐNG PRELOAD VIDEO VÀO RAM/CACHE
+    // =========================================================================
+    const videoBlobMap = new Map();
+
+    async function preloadAllGameVideos() {
+      const videoList = new Set();
+      SCENARIOS.forEach(s => { if (s.videoSrc) videoList.add(s.videoSrc); });
+      videoList.add("videos/scene1_fail.mp4");
+      videoList.add("videos/scene2_fail.mp4");
+      videoList.add("videos/scene5_fail.mp4");
+
+      const total = videoList.size;
+      let loaded = 0;
+
+      const fill = document.getElementById("preload-fill");
+      const statusText = document.getElementById("preload-status-text");
+
+      for (const url of videoList) {
+        try {
+          const res = await fetch(url);
+          if (res.ok) {
+            const blob = await res.blob();
+            const blobUrl = URL.createObjectURL(blob);
+            videoBlobMap.set(url, blobUrl);
+          } else {
+            videoBlobMap.set(url, url);
+          }
+        } catch (e) {
+          videoBlobMap.set(url, url);
+        }
+
+        loaded++;
+        const percent = Math.round((loaded / total) * 100);
+        if (fill) fill.style.width = percent + "%";
+        if (statusText) statusText.innerText = `Đang tải trước tài nguyên: ${percent}% (${loaded}/${total})`;
+      }
+
+      if (statusText) statusText.innerText = `✨ Toàn bộ video đã sẵn sàng (100%)`;
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      preloadAllGameVideos();
+    });
+
+    function getVideoSource(path) {
+      return videoBlobMap.get(path) || path;
+    }
+
+    // =========================================================================
+    // WEB AUDIO API
+    // =========================================================================
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     function playBeep(freq = 600, duration = 0.15) {
       if (audioCtx.state === 'suspended') audioCtx.resume();
@@ -857,7 +1021,10 @@
       }
     }
 
-    function startGame() {
+    // =========================================================================
+    // KHỞI ĐỘNG GAME (TOÀN MÀN HÌNH + TỰ ĐỘNG KHÓA XOAY NGANG)
+    // =========================================================================
+    async function startGame() {
       playSuccessSound();
       const overlay = document.getElementById("start-overlay");
       overlay.style.opacity = "0";
@@ -869,12 +1036,28 @@
         overlay.style.display = "none";
       }, 500);
 
+      // Kích hoạt toàn màn hình
       if (document.documentElement.requestFullscreen) {
-        document.documentElement.requestFullscreen().catch(() => {});
+        try {
+          await document.documentElement.requestFullscreen();
+        } catch (e) {}
       }
+
+      // Khóa xoay ngang tự động nếu trình duyệt cho phép
+      if (screen.orientation && screen.orientation.lock) {
+        try {
+          await screen.orientation.lock("landscape");
+        } catch (err) {
+          console.log("Thiết bị không hỗ trợ web tự khóa xoay ngang:", err);
+        }
+      }
+
       playScene(currentStep);
     }
 
+    // =========================================================================
+    // CHUYỂN CẢNH (ĐÃ FIX BUG DELAY & ZOOM QUÉT VÂN TAY)
+    // =========================================================================
     function playScene(index) {
       const scene = SCENARIOS[index];
       
@@ -915,12 +1098,12 @@
           };
           showInteraction(scene);
         } else {
-          // Chỉ nút ready_btn mới hiển thị ngay khi video nạp xong
+          // Chỉ nút ready_btn mới hiện phủ lên khi clip đang phát
           if (scene.type === "ready_btn") {
             showInteraction(scene);
           }
 
-          // FIX BUG: scene1_door_zoom.mp4 phải CHỜ VIDEO PHÁT XONG (onended) mới hiện khung quét vân tay
+          // FIX BUG: scene1_door_zoom.mp4 phải CHỜ VIDEO PHÁT XONG mới hiện ô quét vân tay
           activePlayer.onended = () => {
             if (scene.type === "show_badge_screen") {
               showInteraction(scene);
@@ -933,7 +1116,7 @@
         }
       };
 
-      nextPlayer.src = scene.videoSrc;
+      nextPlayer.src = getVideoSource(scene.videoSrc);
       nextPlayer.load();
 
       nextPlayer.oncanplay = () => {
@@ -969,7 +1152,7 @@
     function showInteraction(scene) {
       actionZone.innerHTML = "";
 
-      // 1. QUÉT VÂN TAY
+      // 1. QUÉT VÂN TAY[cite: 2]
       if (scene.type === "zoom_scan_center") {
         missionText.innerHTML = scene.text;
         missionText.classList.add("visible");
@@ -1008,7 +1191,7 @@
         anchor.appendChild(scannerBox);
         actionZone.appendChild(anchor);
 
-      // 2. NÚT SẴN SÀNG / QUÉT GƯƠNG MẶT / HÔ KHẨU LỆNH / VỖ TAY
+      // 2. NÚT SẴN SÀNG / QUÉT GƯƠNG MẶT / HÔ KHẨU LỆNH / VỖ TAY[cite: 2]
       } else if (scene.type === "ready_btn") {
         missionText.innerHTML = scene.text;
         missionText.classList.add("visible");
@@ -1022,7 +1205,7 @@
         };
         actionZone.appendChild(btn);
 
-      // 3. CÂU HỎI CHẶNG 1, CHẶNG 2 HOẶC TRẠM KIỂM SOÁT CHẶNG CUỐI
+      // 3. CÂU HỎI TRẮC NGHIỆM TƯƠNG TÁC[cite: 2]
       } else if (scene.type === "choice_with_sample" || scene.type === "choice_face" || scene.type === "choice_final_checkpoint") {
         if (scene.type === "choice_with_sample" || scene.type === "choice_final_checkpoint") {
           missionText.innerHTML = `
@@ -1092,7 +1275,7 @@
           actionZone.appendChild(item);
         });
 
-      // 4. MÀN HÌNH HUY HIỆU KẾT THÚC
+      // 4. MÀN HÌNH HUY HIỆU KẾT THÚC[cite: 2]
       } else if (scene.type === "show_badge_screen") {
         missionText.innerHTML = scene.text;
         missionText.classList.add("visible");
@@ -1102,7 +1285,7 @@
     }
 
     function playFailVideoFeedback(failVideo, loopVideo) {
-      nextPlayer.src = failVideo;
+      nextPlayer.src = getVideoSource(failVideo);
       nextPlayer.loop = false;
       nextPlayer.removeAttribute("loop");
       nextPlayer.load();
@@ -1132,7 +1315,7 @@
     }
 
     function resumeWaitingLoop(loopVideo) {
-      nextPlayer.src = loopVideo;
+      nextPlayer.src = getVideoSource(loopVideo);
       nextPlayer.loop = true;
       nextPlayer.setAttribute("loop", "true");
       nextPlayer.load();
