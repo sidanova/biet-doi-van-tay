@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Biệt Đội Vân Tay - Giải Cứu Kho Báu Công Nghệ</title>
   <style>
     * {
@@ -36,7 +36,7 @@
       justify-content: center;
       align-items: center;
       text-align: center;
-      padding: 30px;
+      padding: 20px;
     }
 
     @media screen and (orientation: portrait) {
@@ -46,9 +46,9 @@
     }
 
     .rotate-phone-icon {
-      font-size: 80px;
+      font-size: clamp(60px, 15vw, 90px);
       animation: rotateGuide 1.8s ease-in-out infinite alternate;
-      margin-bottom: 20px;
+      margin-bottom: 15px;
     }
 
     @keyframes rotateGuide {
@@ -59,14 +59,14 @@
 
     .rotate-text-title {
       color: #ff9100;
-      font-size: clamp(22px, 5vw, 28px);
+      font-size: clamp(20px, 4.5vw, 28px);
       font-weight: 900;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
     }
 
     .rotate-text-desc {
       color: #00f2fe;
-      font-size: clamp(16px, 3.5vw, 20px);
+      font-size: clamp(14px, 3vw, 18px);
       font-weight: 700;
     }
 
@@ -77,10 +77,12 @@
       position: relative;
       width: 100vw;
       height: 100vh;
+      height: 100dvh; /* Dynamic viewport cho trình duyệt di động */
       display: flex;
       justify-content: center;
       align-items: center;
       background: #061126;
+      overflow: hidden;
     }
 
     .bg-video {
@@ -101,7 +103,7 @@
       left: 0;
       width: 100%;
       height: 100%;
-      box-shadow: inset 0 0 100px rgba(255, 122, 0, 0.25);
+      box-shadow: inset 0 0 clamp(40px, 8vw, 100px) rgba(255, 122, 0, 0.25);
       pointer-events: none;
       z-index: 5;
     }
@@ -117,34 +119,38 @@
       flex-direction: column;
       justify-content: space-between;
       align-items: center;
-      padding: 3vh 4vw;
+      padding: clamp(10px, 2.5vh, 25px) clamp(15px, 4vw, 40px);
+      padding-top: max(clamp(10px, 2.5vh, 25px), env(safe-area-inset-top));
+      padding-bottom: max(clamp(10px, 2.5vh, 25px), env(safe-area-inset-bottom));
+      padding-left: max(clamp(15px, 4vw, 40px), env(safe-area-inset-left));
+      padding-right: max(clamp(15px, 4vw, 40px), env(safe-area-inset-right));
       pointer-events: none;
     }
 
     /* NÚT TUA NHANH DÀNH CHO GIÁO VIÊN */
     #fast-forward-btn {
       position: absolute;
-      top: 20px;
-      right: 25px;
+      top: max(12px, env(safe-area-inset-top));
+      right: max(16px, env(safe-area-inset-right));
       z-index: 30;
       pointer-events: auto;
       background: rgba(255, 255, 255, 0.92);
-      border: 3px solid transparent;
+      border: 2px solid transparent;
       background-image: linear-gradient(rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.95)),
                         linear-gradient(135deg, #ff9a00, #ff5100);
       background-origin: border-box;
       background-clip: padding-box, border-box;
       color: #e65100;
-      padding: 10px 22px;
-      border-radius: 30px;
-      font-size: 16px;
+      padding: clamp(5px, 1vh, 10px) clamp(12px, 2vw, 22px);
+      border-radius: 25px;
+      font-size: clamp(12px, 1.8vh, 16px);
       font-weight: 800;
       cursor: pointer;
       box-shadow: 0 4px 15px rgba(255, 106, 0, 0.35);
       transition: all 0.2s ease;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
     }
     #fast-forward-btn:hover {
       transform: scale(1.05);
@@ -155,26 +161,26 @@
     /* HỘP THOẠI ROBOT TIPI */
     .mission-header {
       background: rgba(255, 255, 255, 0.94);
-      border: 4px solid transparent;
+      border: 3px solid transparent;
       background-image: linear-gradient(rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.95)),
                         linear-gradient(135deg, #ffb300, #ff5e00, #ff2a00);
       background-origin: border-box;
       background-clip: padding-box, border-box;
-      border-radius: 40px;
-      padding: 16px 45px;
+      border-radius: clamp(20px, 4vw, 35px);
+      padding: clamp(8px, 1.8vh, 14px) clamp(18px, 3.5vw, 36px);
       color: #d84315;
-      font-size: clamp(20px, 3vw, 30px);
+      font-size: clamp(14px, 2.8vh, 24px);
       font-weight: 900;
-      box-shadow: 0 12px 35px rgba(255, 87, 34, 0.3), inset 0 2px 4px rgba(255, 255, 255, 0.8);
-      transform: translateY(-130px);
-      transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      box-shadow: 0 8px 25px rgba(255, 87, 34, 0.25), inset 0 2px 4px rgba(255, 255, 255, 0.8);
+      transform: translateY(-150%);
+      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
       pointer-events: auto;
       text-align: center;
       max-width: 90%;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 12px;
+      gap: clamp(6px, 1vh, 10px);
     }
     .mission-header.visible { transform: translateY(0); }
 
@@ -182,30 +188,34 @@
     .sample-reference-box {
       display: flex;
       align-items: center;
-      gap: 15px;
+      gap: clamp(8px, 1.5vw, 15px);
       background: linear-gradient(135deg, #fff3e0, #ffe0b2);
       border: 2px dashed #ff6f00;
-      border-radius: 24px;
-      padding: 6px 22px;
+      border-radius: 20px;
+      padding: clamp(3px, 0.8vh, 6px) clamp(12px, 2vw, 20px);
       box-shadow: inset 0 1px 3px rgba(0,0,0,0.08);
     }
     .sample-reference-box span {
-      font-size: 16px;
+      font-size: clamp(12px, 2vh, 16px);
       color: #e65100;
       font-weight: 900;
+    }
+    .sample-preview-icon {
+      width: clamp(28px, 5vh, 44px);
+      height: clamp(34px, 6vh, 52px);
     }
 
     #action-zone {
       display: flex;
-      gap: 30px;
+      gap: clamp(12px, 2.5vw, 28px);
       align-items: center;
       justify-content: center;
       pointer-events: auto;
-      margin-bottom: 4vh;
+      margin-bottom: clamp(5px, 1.5vh, 15px);
       width: 100%;
     }
 
-    /* NÚT VÂN TAY CĂN GIỮA */
+    /* NÚT VÂN TAY CĂN GIỮA MÀN HÌNH */
     .scanner-center-anchor {
       position: absolute;
       top: 50%;
@@ -215,26 +225,26 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 12px;
-      animation: popOutCenter 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.3) forwards;
+      gap: 10px;
+      animation: popOutCenter 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.3) forwards;
     }
     @keyframes popOutCenter {
-      0% { transform: translate(-50%, -50%) scale(0.1); opacity: 0; }
+      0% { transform: translate(-50%, -50%) scale(0.2); opacity: 0; }
       100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
     }
 
     .scanner-container {
       position: relative;
-      width: 220px;
-      height: 220px;
-      border-radius: 45px;
+      width: clamp(140px, 35vh, 210px);
+      height: clamp(140px, 35vh, 210px);
+      border-radius: clamp(28px, 6vh, 42px);
       background: rgba(255, 255, 255, 0.94);
-      border: 5px solid transparent;
+      border: 4px solid transparent;
       background-image: linear-gradient(rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.95)),
                         linear-gradient(135deg, #ffc107, #ff6f00, #ff3d00);
       background-origin: border-box;
       background-clip: padding-box, border-box;
-      box-shadow: 0 10px 40px rgba(255, 111, 0, 0.4);
+      box-shadow: 0 10px 35px rgba(255, 111, 0, 0.4);
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -243,19 +253,19 @@
       overflow: hidden;
       transition: all 0.25s ease;
     }
-    .scanner-container:hover { transform: scale(1.05); }
+    .scanner-container:hover { transform: scale(1.04); }
 
     .scanner-icon-svg {
-      width: 120px;
-      height: 145px;
-      filter: drop-shadow(0 2px 8px rgba(255, 111, 0, 0.4));
+      width: clamp(75px, 20vh, 125px);
+      height: clamp(90px, 24vh, 145px);
+      filter: drop-shadow(0 2px 6px rgba(255, 111, 0, 0.4));
     }
     .scanner-hint {
       color: #e65100;
-      font-size: 15px;
+      font-size: clamp(11px, 2vh, 14px);
       font-weight: 900;
-      margin-top: 5px;
-      letter-spacing: 1.5px;
+      margin-top: 4px;
+      letter-spacing: 1px;
       text-transform: uppercase;
     }
     .laser-line {
@@ -263,75 +273,81 @@
       position: absolute;
       left: 0;
       width: 100%;
-      height: 8px;
+      height: 6px;
       background: #00e676;
-      box-shadow: 0 0 25px #00e676;
+      box-shadow: 0 0 20px #00e676;
     }
     .scanner-container.scanning .laser-line {
       display: block;
       animation: scanSweep 1.2s infinite alternate ease-in-out;
     }
     @keyframes scanSweep {
-      0% { top: 5%; }
+      0% { top: 6%; }
       100% { top: 90%; }
     }
 
     /* NÚT TƯƠNG TÁC CHÍNH */
     .btn-ready {
-      padding: 20px 60px;
-      font-size: clamp(22px, 3.2vw, 34px);
+      padding: clamp(12px, 2.5vh, 18px) clamp(28px, 5vw, 55px);
+      font-size: clamp(16px, 3vh, 26px);
       font-weight: 900;
-      border-radius: 50px;
-      border: 4px solid #fff;
+      border-radius: 40px;
+      border: 3px solid #fff;
       background: linear-gradient(135deg, #ff9100, #ff3d00);
       color: #ffffff;
       cursor: pointer;
-      box-shadow: 0 10px 40px rgba(255, 61, 0, 0.5);
+      box-shadow: 0 8px 30px rgba(255, 61, 0, 0.5);
       animation: bounce-ready 1.5s infinite ease-in-out;
       transition: transform 0.15s;
     }
-    .btn-ready:active { transform: scale(0.92); }
+    .btn-ready:active { transform: scale(0.94); }
     @keyframes bounce-ready {
-      0%, 100% { transform: scale(1); box-shadow: 0 10px 30px rgba(255, 61, 0, 0.4); }
-      50% { transform: scale(1.08); box-shadow: 0 15px 50px rgba(255, 61, 0, 0.7); }
+      0%, 100% { transform: scale(1); box-shadow: 0 6px 20px rgba(255, 61, 0, 0.4); }
+      50% { transform: scale(1.05); box-shadow: 0 10px 40px rgba(255, 61, 0, 0.7); }
     }
 
-    /* THẺ LỰA CHỌN A - B - C */
+    /* THẺ LỰA CHỌN A - B - C (RESPONSIVE CHỐNG TRÀN DỌC) */
     .choice-item {
-      width: clamp(160px, 22vw, 240px);
-      height: clamp(210px, 30vw, 290px);
+      width: clamp(105px, 22vw, 210px);
+      height: clamp(140px, 44vh, 260px);
       background: rgba(255, 255, 255, 0.94);
-      border: 5px solid transparent;
+      border: 3.5px solid transparent;
       background-image: linear-gradient(rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.95)),
                         linear-gradient(135deg, #ffb300, #ff6d00, #ff3d00);
       background-origin: border-box;
       background-clip: padding-box, border-box;
-      border-radius: 35px;
+      border-radius: clamp(18px, 3.5vw, 30px);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 15px;
+      gap: clamp(6px, 1.5vh, 12px);
       cursor: pointer;
-      box-shadow: 0 12px 30px rgba(255, 109, 0, 0.25);
-      transition: transform 0.25s ease, opacity 0.4s ease;
+      box-shadow: 0 8px 24px rgba(255, 109, 0, 0.25);
+      transition: transform 0.2s ease, opacity 0.3s ease;
+      padding: clamp(6px, 1vh, 10px);
     }
     .choice-item:hover {
-      transform: translateY(-8px) scale(1.05);
-      box-shadow: 0 18px 45px rgba(255, 109, 0, 0.5);
+      transform: translateY(-5px) scale(1.04);
+      box-shadow: 0 12px 35px rgba(255, 109, 0, 0.5);
     }
     .choice-graphic-wrapper {
-      width: 105px;
-      height: 130px;
+      width: clamp(65px, 16vw, 110px);
+      height: clamp(75px, 25vh, 135px);
       display: flex;
       justify-content: center;
       align-items: center;
-      font-size: 80px;
+      font-size: clamp(48px, 12vh, 75px);
+    }
+    .choice-graphic-wrapper svg {
+      width: 100%;
+      height: 100%;
     }
     .choice-item .label {
-      font-size: clamp(18px, 2.4vw, 24px);
+      font-size: clamp(12px, 2.4vh, 18px);
       font-weight: 900;
       color: #d84315;
+      text-align: center;
     }
 
     .choice-item.wrong-shake {
@@ -341,46 +357,48 @@
     }
     @keyframes shakeWrong {
       0%, 100% { transform: translateX(0); }
-      20%, 60% { transform: translateX(-12px); }
-      40%, 80% { transform: translateX(12px); }
+      20%, 60% { transform: translateX(-10px); }
+      40%, 80% { transform: translateX(10px); }
     }
     .choice-item.fade-disappear {
       opacity: 0 !important;
-      transform: scale(0.4) !important;
+      transform: scale(0.3) !important;
       pointer-events: none;
     }
     .choice-item.correct-glow {
       background-image: linear-gradient(rgba(232, 245, 233, 0.95), rgba(232, 245, 233, 0.95)),
                         linear-gradient(135deg, #00e676, #00b0ff) !important;
-      box-shadow: 0 0 60px rgba(0, 230, 118, 0.9) !important;
-      transform: scale(1.1) !important;
+      box-shadow: 0 0 50px rgba(0, 230, 118, 0.9) !important;
+      transform: scale(1.08) !important;
     }
 
-    /* POPUP HUY HIỆU CHIẾN THẮNG CUỐI CÙNG */
+    /* POPUP HUY HIỆU CHIẾN THẮNG */
     #badge-modal {
       display: none;
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      background: rgba(255, 255, 255, 0.96);
-      border: 6px solid #ff9100;
-      border-radius: 40px;
-      padding: 40px 50px;
+      background: rgba(255, 255, 255, 0.97);
+      border: 5px solid #ff9100;
+      border-radius: clamp(25px, 5vw, 40px);
+      padding: clamp(20px, 4vh, 35px) clamp(25px, 5vw, 45px);
       text-align: center;
       z-index: 100;
-      box-shadow: 0 0 100px rgba(255, 145, 0, 0.8), 0 20px 40px rgba(0,0,0,0.5);
-      max-width: 85%;
-      animation: popBadge 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+      box-shadow: 0 0 80px rgba(255, 145, 0, 0.7);
+      width: min(85vw, 550px);
+      max-height: 90vh;
+      overflow-y: auto;
+      animation: popBadge 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
     }
     @keyframes popBadge {
       0% { transform: translate(-50%, -50%) scale(0.3); opacity: 0; }
       100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
     }
     .badge-icon {
-      font-size: 110px;
+      font-size: clamp(60px, 14vh, 95px);
       animation: spinBadge 8s infinite linear;
-      margin-bottom: 15px;
+      margin-bottom: 8px;
     }
     @keyframes spinBadge {
       0% { transform: rotate(0deg); }
@@ -388,7 +406,7 @@
     }
 
     /* =====================================================================
-       MÀN HÌNH CHỜ THẢ NỔI TRỰC TIẾP
+       MÀN HÌNH CHỜ (START OVERLAY) RESPONSIVE
        ===================================================================== */
     #start-overlay {
       position: absolute;
@@ -401,7 +419,9 @@
       flex-direction: column;
       justify-content: space-between;
       align-items: center;
-      padding: 6vh 4vw 8vh 4vw;
+      padding: clamp(15px, 3vh, 35px) clamp(15px, 4vw, 40px);
+      padding-top: max(clamp(15px, 3vh, 35px), env(safe-area-inset-top));
+      padding-bottom: max(clamp(15px, 3vh, 35px), env(safe-area-inset-bottom));
       background: transparent;
       overflow: hidden;
       transition: opacity 0.5s ease-out;
@@ -424,7 +444,7 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: radial-gradient(circle at center, rgba(6, 17, 38, 0.1) 0%, rgba(6, 17, 38, 0.6) 100%);
+      background: radial-gradient(circle at center, rgba(6, 17, 38, 0.1) 0%, rgba(6, 17, 38, 0.65) 100%);
       z-index: 2;
       pointer-events: none;
     }
@@ -440,38 +460,37 @@
 
     .title-badge-row {
       display: flex;
-      gap: 12px;
-      margin-bottom: 12px;
+      gap: 10px;
+      margin-bottom: clamp(4px, 1vh, 8px);
     }
     .title-pill {
-      background: rgba(255, 255, 255, 0.9);
-      border: 2px solid #ff9100;
+      background: rgba(255, 255, 255, 0.92);
+      border: 1.5px solid #ff9100;
       color: #e65100;
-      padding: 6px 18px;
-      border-radius: 20px;
-      font-size: 13px;
+      padding: clamp(3px, 0.6vh, 5px) clamp(10px, 2vw, 15px);
+      border-radius: 15px;
+      font-size: clamp(10px, 1.8vh, 12px);
       font-weight: 900;
-      letter-spacing: 0.8px;
       text-transform: uppercase;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
     }
 
     .title-main-text {
-      font-size: clamp(34px, 5.5vw, 60px);
+      font-size: clamp(24px, 6vh, 50px);
       font-weight: 1000;
-      letter-spacing: 2px;
+      letter-spacing: 1.5px;
       line-height: 1.15;
       color: #ffffff;
-      text-shadow: 0 4px 20px rgba(255, 109, 0, 0.9), 0 2px 4px #000;
+      text-shadow: 0 4px 18px rgba(255, 109, 0, 0.9), 0 2px 4px #000;
     }
 
     .title-sub-text {
-      font-size: clamp(18px, 2.8vw, 30px);
+      font-size: clamp(14px, 3vh, 24px);
       font-weight: 900;
       color: #00f2fe;
-      letter-spacing: 1.5px;
-      text-shadow: 0 2px 15px rgba(0, 242, 254, 0.8), 0 2px 4px #000;
-      margin-top: 6px;
+      letter-spacing: 1px;
+      text-shadow: 0 2px 12px rgba(0, 242, 254, 0.8), 0 2px 4px #000;
+      margin-top: 4px;
     }
 
     .title-action-zone {
@@ -480,31 +499,31 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 14px;
+      gap: clamp(6px, 1.5vh, 12px);
       width: 100%;
-      max-width: 500px;
+      max-width: 420px;
     }
 
     .pro-start-btn {
       position: relative;
-      padding: clamp(18px, 2.6vh, 25px) clamp(55px, 6vw, 80px);
-      font-size: clamp(24px, 3.2vw, 36px);
+      padding: clamp(12px, 2.4vh, 18px) clamp(35px, 6vw, 65px);
+      font-size: clamp(18px, 3.4vh, 28px);
       font-weight: 1000;
-      letter-spacing: 1.5px;
-      border-radius: 60px;
-      border: 4px solid #ffffff;
+      letter-spacing: 1px;
+      border-radius: 45px;
+      border: 3.5px solid #ffffff;
       background: linear-gradient(135deg, #ff9100 0%, #ff5722 50%, #e65100 100%);
       color: #ffffff;
       cursor: pointer;
       box-shadow: 
-        0 14px 40px rgba(255, 87, 34, 0.7),
-        0 0 35px rgba(255, 145, 0, 0.8),
+        0 10px 30px rgba(255, 87, 34, 0.7),
+        0 0 25px rgba(255, 145, 0, 0.8),
         inset 0 3px 6px rgba(255, 255, 255, 0.7);
       transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
       overflow: hidden;
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 12px;
     }
 
     .pro-start-btn::before {
@@ -529,39 +548,37 @@
     }
 
     .pro-start-btn:hover {
-      transform: scale(1.07) translateY(-3px);
-      box-shadow: 
-        0 18px 50px rgba(255, 87, 34, 0.85),
-        0 0 45px rgba(255, 145, 0, 1);
+      transform: scale(1.05) translateY(-2px);
+      box-shadow: 0 14px 40px rgba(255, 87, 34, 0.85);
     }
     .pro-start-btn:active {
       transform: scale(0.96) translateY(2px);
     }
 
     .rocket-icon {
-      font-size: 1.25em;
+      font-size: 1.2em;
       display: inline-block;
       animation: rocketHover 1.5s ease-in-out infinite alternate;
     }
     @keyframes rocketHover {
       0% { transform: translateY(0) rotate(0deg); }
-      100% { transform: translateY(-5px) rotate(10deg); }
+      100% { transform: translateY(-4px) rotate(10deg); }
     }
 
-    /* THANH TIẾN TRÌNH PRELOAD VIDEO */
+    /* THANH TIẾN TRÌNH PRELOAD */
     #preload-progress-box {
       width: 100%;
-      max-width: 320px;
+      max-width: 280px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 6px;
+      gap: 4px;
     }
     .progress-bar-bg {
       width: 100%;
-      height: 10px;
+      height: 8px;
       background: rgba(255, 255, 255, 0.2);
-      border-radius: 10px;
+      border-radius: 8px;
       overflow: hidden;
       border: 1px solid rgba(255, 145, 0, 0.4);
       box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);
@@ -570,12 +587,12 @@
       width: 0%;
       height: 100%;
       background: linear-gradient(90deg, #ff9100, #00e676);
-      border-radius: 10px;
+      border-radius: 8px;
       transition: width 0.3s ease;
       box-shadow: 0 0 10px #00e676;
     }
     #preload-status-text {
-      font-size: 13px;
+      font-size: clamp(10px, 1.8vh, 12px);
       color: #00f2fe;
       font-weight: 800;
       letter-spacing: 0.5px;
@@ -583,7 +600,7 @@
     }
 
     .title-footer-tip {
-      font-size: 15px;
+      font-size: clamp(11px, 2vh, 13px);
       color: rgba(255, 255, 255, 0.85);
       font-weight: 800;
       letter-spacing: 0.5px;
@@ -593,18 +610,14 @@
 </head>
 <body>
 
-  <!-- ==========================================================
-       MÀN HÌNH NHẮC XOAY NGANG THIẾT BỊ (CHO ĐIỆN THOẠI/TABLET)
-       ========================================================== -->
+  <!-- MÀN HÌNH NHẮC XOAY NGANG THIẾT BỊ -->
   <div id="rotate-device-overlay">
     <div class="rotate-phone-icon">📱</div>
     <div class="rotate-text-title">HÃY XOAY NGANG THIẾT BỊ NHÉ!</div>
     <div class="rotate-text-desc">Để có góc nhìn tốt nhất cùng Robot Tipi 🚀</div>
   </div>
 
-  <!-- ==========================================================
-       MÀN HÌNH CHỜ THẢ NỔI TRỰC TIẾP
-       ========================================================== -->
+  <!-- MÀN HÌNH CHỜ THẢ NỔI TRỰC TIẾP -->
   <div id="start-overlay">
     <video id="title-bg-video" autoplay loop muted playsinline>
       <source src="videos/title_screen_loop.mp4" type="video/mp4">
@@ -626,7 +639,6 @@
         <span class="rocket-icon">🚀</span>
       </button>
 
-      <!-- THANH TRẠNG THÁI PRELOAD -->
       <div id="preload-progress-box">
         <div class="progress-bar-bg">
           <div id="preload-fill"></div>
@@ -638,9 +650,7 @@
     </div>
   </div>
 
-  <!-- ==========================================================
-       VIEWPORT CHÍNH
-       ========================================================== -->
+  <!-- VIEWPORT CHÍNH -->
   <div id="game-viewport">
     <div class="tech-vignette"></div>
 
@@ -658,14 +668,14 @@
 
     <div id="badge-modal">
       <div class="badge-icon">🎖️</div>
-      <h1 style="color: #d84315; font-size: 36px; margin-bottom: 15px; font-weight: 900;">
-        HUY HIỆU BIỆT ĐỘI VÂN TAY THÔNG MINH!
+      <h1 style="color: #d84315; font-size: clamp(20px, 4vh, 32px); margin-bottom: 10px; font-weight: 900;">
+        HUY HIỆU BIỆT ĐỘI VÂN TAY!
       </h1>
-      <p style="font-size: 22px; line-height: 1.6; color: #37474f; font-weight: 700; margin-bottom: 25px;">
+      <p style="font-size: clamp(14px, 2.5vh, 18px); line-height: 1.5; color: #37474f; font-weight: 700; margin-bottom: 18px;">
         Chúc mừng các bạn nhỏ đã hoàn thành xuất sắc tất cả nhiệm vụ bảo mật!<br>
-        <strong style="color: #ff6d00;">Ghi nhớ bài học:</strong> Dấu vân tay là thông tin riêng tư, chúng ta không tự ý lấy dấu vân tay của người khác nhé!
+        <strong style="color: #ff6d00;">Ghi nhớ bài học:</strong> Dấu vân tay là thông tin riêng tư, không tự ý lấy dấu vân tay của người khác nhé!
       </p>
-      <button onclick="location.reload()" style="padding: 16px 45px; font-size: 22px; font-weight: 900; border-radius: 35px; background: linear-gradient(135deg, #ff9100, #ff3d00); color: #fff; border: none; cursor: pointer; box-shadow: 0 8px 25px rgba(255, 61, 0, 0.5);">
+      <button onclick="location.reload()" style="padding: clamp(10px, 2vh, 15px) clamp(25px, 4vw, 40px); font-size: clamp(15px, 2.5vh, 20px); font-weight: 900; border-radius: 30px; background: linear-gradient(135deg, #ff9100, #ff3d00); color: #fff; border: none; cursor: pointer; box-shadow: 0 6px 20px rgba(255, 61, 0, 0.5);">
         CHƠI LẠI TỪ ĐẦU 🔄
       </button>
     </div>
@@ -1056,7 +1066,7 @@
     }
 
     // =========================================================================
-    // CHUYỂN CẢNH (ĐÃ FIX BUG DELAY & ZOOM QUÉT VÂN TAY)
+    // CHUYỂN CẢNH
     // =========================================================================
     function playScene(index) {
       const scene = SCENARIOS[index];
@@ -1098,12 +1108,10 @@
           };
           showInteraction(scene);
         } else {
-          // Chỉ nút ready_btn mới hiện phủ lên khi clip đang phát
           if (scene.type === "ready_btn") {
             showInteraction(scene);
           }
 
-          // FIX BUG: scene1_door_zoom.mp4 phải CHỜ VIDEO PHÁT XONG mới hiện ô quét vân tay
           activePlayer.onended = () => {
             if (scene.type === "show_badge_screen") {
               showInteraction(scene);
@@ -1205,14 +1213,14 @@
         };
         actionZone.appendChild(btn);
 
-      // 3. CÂU HỎI TRẮC NGHIỆM TƯƠNG TÁC[cite: 2]
+      // 3. CÂU HỎI TRẮC NGHIỆM TƯƠNG TÁC (TỐI ƯU RESPONSIVE PREVIEW)[cite: 2]
       } else if (scene.type === "choice_with_sample" || scene.type === "choice_face" || scene.type === "choice_final_checkpoint") {
         if (scene.type === "choice_with_sample" || scene.type === "choice_final_checkpoint") {
           missionText.innerHTML = `
             <div>${scene.text}</div>
             <div class="sample-reference-box">
               <span>VÂN TAY ĐĂNG KÝ BAN ĐẦU:</span>
-              <div style="width: 48px; height: 58px;">${REAL_FINGERPRINT_SVG}</div>
+              <div class="sample-preview-icon">${REAL_FINGERPRINT_SVG}</div>
             </div>
           `;
         } else {
@@ -1220,7 +1228,7 @@
             <div>${scene.text}</div>
             <div class="sample-reference-box">
               <span>MẪU GƯƠNG MẶT:</span>
-              <span style="font-size: 32px;">😄 (CƯỜI TƯƠI)</span>
+              <span style="font-size: clamp(20px, 4vh, 32px);">😄 (CƯỜI TƯƠI)</span>
             </div>
           `;
         }
